@@ -13,6 +13,7 @@ export default class App extends React.Component {
     super(props)
     this.state = {
       data: "",
+      specified_character_count: 0,
     }
   }
   setData(data) {
@@ -29,30 +30,33 @@ export default class App extends React.Component {
   onContentChange() {
     const data = JSON.parse(this.container.documentEditor.serialize())
     const sections = data.sections[0].blocks
-    var total = 0
+    var characters = 0
     console.clear()
     sections.map(obj_1 => {
       obj_1.inlines.map(obj_2 => {
         var text = obj_2.text
-        text = text.replaceAll(" ", "")
-        total += text.length
-        console.log("text", obj_2.text)
+        //        text = text.replaceAll(" ", "")
+        characters += text.length
+        console.log("text", obj_2.text, text.length)
       })
     })
-    console.log(
-      "text",
-      data,
-      "lines",
-      sections.length,
-      "calculated lines  : ",
-      Number(total / 60),
-      "characters: ",
-      total,
-      ""
-    )
+    var line = 0
+    if (
+      characters >= this.state.specified_character_count &&
+      this.state.specified_character_count > 0
+    ) {
+      line = characters / this.state.specified_character_count
+      characters = characters % this.state.specified_character_count
+    }
+
+    console.log(`Total ${line} lines, ${characters} characters.`)
+    console.log("data", data)
   }
   hidePropertiesPane() {
     this.container.showPropertiesPane = false
+  }
+  updateSpecifiedCharacterCount(e) {
+    this.setState({ specified_character_count: e.target.value })
   }
   render() {
     return (
@@ -82,7 +86,22 @@ export default class App extends React.Component {
             }
           }}
         />
-        <form action='#'>
+        <form
+          action='#'
+          onSubmit={e => {
+            e.preventDefault()
+          }}
+        >
+          <label htmlFor='specified_character_count'>
+            Specified Character Count
+          </label>
+          &nbsp;
+          <input
+            type='number'
+            id='specified_character_count'
+            name='specified_character_count'
+            onChange={this.updateSpecifiedCharacterCount.bind(this)}
+          />
           <div style={{ width: "auto", height: "auto" }} name='textarea'>
             <DocumentEditorContainerComponent
               contentChange={e => this.onContentChange(e)}
@@ -92,6 +111,11 @@ export default class App extends React.Component {
               id='container'
               height='50vh'
               enableToolbar={true}
+              trackChange={e => {
+                console.log("track changes", e)
+              }}
+              onChange={e => console.log("onchange account ", e)}
+              documentChange={e => console.log("documentChange account ", e)}
               serviceUrl='https://ej2services.syncfusion.com/production/web-services/api/documenteditor/'
             />
           </div>
