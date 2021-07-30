@@ -49,7 +49,7 @@ export default class App extends React.Component {
       characters = characters % this.state.specified_character_count
     }
 
-    console.log(`Total ${line} lines, ${characters} characters.`)
+    console.log(`Total ${parseInt(line)} lines, ${characters} characters.`)
     console.log("data", data)
   }
   hidePropertiesPane() {
